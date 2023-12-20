@@ -4,7 +4,7 @@ const categoryDb = require("../models/categoryModel");
 const productDb = require("../models/productModel");
 const { findIncome,countSales, findSalesData,findSalesDataOfYear, findSalesDataOfMonth, formatNum,} = require("../helpers/orderHelper");
 
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 const randomstring = require("randomstring");
 const config = require("../config/config");
 const nodemailer = require("nodemailer");

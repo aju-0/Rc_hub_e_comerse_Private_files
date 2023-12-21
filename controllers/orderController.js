@@ -551,7 +551,7 @@ const currentDate = new Date();
     .catch((error) => {
       console.log(error);
     });
-  const filepath = "http://localhost:5000/docs/" + filename;
+  const filepath = "https://rc-hub-ecomerse.onrender.com//docs/" + filename;
 
   res.render("download", {
     path: filepath,user:userData

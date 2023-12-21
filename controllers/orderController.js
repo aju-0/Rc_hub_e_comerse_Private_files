@@ -92,7 +92,7 @@ const loadCheckOut = async (req, res) => {
 
             const totalamount = Total;
             
-            res.render("/checkOut", {
+            res.render("checkout", {
               userId: userId,
               products: products,
               total: Total,

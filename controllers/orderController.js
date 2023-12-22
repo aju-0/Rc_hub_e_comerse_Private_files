@@ -10,14 +10,6 @@ const crypto = require("crypto");
 const { log } = require("console");
 
 // pdf Generator
-const fs = require("fs");
-const pdf = require("pdf-creator-node");
-const path = require("path");
-const options = require("../helpers/options");
-const { loginLoad } = require("./userController");
-
-
-
 var instance = new Razorpay({
   key_id: process.env.KEY_ID,
   key_secret: process.env.KEY_SECRET,

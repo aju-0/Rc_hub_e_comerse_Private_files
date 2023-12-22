@@ -42,7 +42,7 @@ const newContact = async (req, res) => {
     const contactData = await contact.save();
 
     if (contactData) {
-      console.log("all matched");
+      // console.log("all matched");
       res.json({
         success: true,
         message: "Thank you for contacting ! we will get touch with you.",

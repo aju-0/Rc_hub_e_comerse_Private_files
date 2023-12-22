@@ -165,12 +165,12 @@ const ApplyCoupon = async (req, res) => {
       if (cartData.products.length > 0) {
         const products = cartData.products;
 
-        console.log(products,"+++++++++++++++++++++");
+        // console.log(products,"+++++++++++++++++++++");
 
         for (const product of cartData.products) {
-          console.log(product.quantity,"****",product.price);
+          // console.log(product.quantity,"****",product.price);
           totalPrice += product.quantity * product.price;
-          console.log(("Toatal Prize:",totalPrice));
+          // console.log(("Toatal Prize:",totalPrice));
         }
       }
     }

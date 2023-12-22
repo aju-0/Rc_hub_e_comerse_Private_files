@@ -48,9 +48,7 @@ const sendVerifyMail = async (name, email, user_id) => {
       html:
         "<p>Hii" +
         name +
-        ', please click here to <a href="http://127.0.0.1:5000/verify?id=' +
-        user_id +
-        '"> Verify </a> your mail.</p>',
+        ', please click here to <a href="https://rc-hub-ecomerse.onrender.com/verify?id=' +user_id +'"> Verify </a> your mail.</p>',
     };
     transporter.sendMail(mailOptions, function (error, info) {
       if (error) {
@@ -84,7 +82,7 @@ const sendResetPasswordMail = async (name, email, token) => {
       html:
         "<p>Hii " +
         name +
-        ', please click here to <a href="http://127.0.0.1:5000/forget-password?token=' +
+        ', please click here to <a href="https://rc-hub-ecomerse.onrender.com/forget-password?token=' +
         token +
         '"> Reset </a> your password.</p>',
     };

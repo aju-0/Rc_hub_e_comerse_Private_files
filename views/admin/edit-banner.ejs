@@ -124,6 +124,75 @@
    </div>
    <!-- container-scroller -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+<script>
+  $(document).ready(function () {
+    // Enable submit button only if there are no errors
+    function enableSubmitButton() {
+      var hasErrors = $('.error-message:visible').length > 0;
+      $('#updateBannerBtn').prop('disabled', hasErrors);
+    }
+
+    // Validation for Banner Name
+    $('input[name="bannerName"]').on('blur', function () {
+      var bannerName = $(this).val();
+      var errorMessage = '';
+
+      // Add your custom validation logic here
+
+      $('#bannerNameError').text(errorMessage).toggle(errorMessage !== '');
+      enableSubmitButton();
+    });
+
+    // Validation for Banner Name 2
+    $('input[name="bannerName2"]').on('blur', function () {
+      var bannerName2 = $(this).val();
+      var errorMessage = '';
+
+      // Add your custom validation logic here
+
+      $('#bannerName2Error').text(errorMessage).toggle(errorMessage !== '');
+      enableSubmitButton();
+    });
+
+    // Validation for Specification
+    $('input[name="specification"]').on('blur', function () {
+      var specification = $(this).val();
+      var errorMessage = '';
+
+      // Add your custom validation logic here
+
+      $('#specificationError').text(errorMessage).toggle(errorMessage !== '');
+      enableSubmitButton();
+    });
+
+    // Validation for Product
+    $('#product').on('change', function () {
+      var selectedProduct = $(this).val();
+      var errorMessage = '';
+
+      if (!selectedProduct) {
+        errorMessage = 'Please select a product.';
+      }
+
+      $('#productError').text(errorMessage).toggle(errorMessage !== '');
+      enableSubmitButton();
+    });
+
+    // Continue adding similar blur or change event handlers for other fields...
+
+    // Form submission
+    $('#bannerForm').on('submit', function () {
+      // Additional server-side validation can be added here
+      // Return false to prevent the form from being submitted if there are errors
+      return !$('.error-message:visible').length > 0;
+    });
+
+    // Hide error messages after 5 seconds
+    setTimeout(function () {
+      $('.error-message').fadeOut();
+    }, 5000);
+  });
+</script>
 
 <script>
    function previewImage(input) {

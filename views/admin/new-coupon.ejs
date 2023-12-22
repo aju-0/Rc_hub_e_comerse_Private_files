@@ -71,6 +71,7 @@
             <form class="forms-sample" action="" method="post" id="couponForm">
   <!-- Your form content -->
 
+ 
   <div class="form-group">
     <label for="couponName" class="form-label">Coupon Name</label>
     <input type="text" class="form-control" name="couponName" id="couponName" placeholder="Coupon Name" required>
@@ -122,6 +123,7 @@
   <button type="submit" class="btn btn-primary mr-2" id="submitBtn" disabled>Add coupon</button>
 </form>
 
+
               
                 
               </div>
@@ -140,13 +142,13 @@
    </div>
    <!-- container-scroller -->
 
-  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+ <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 
 <!-- Your existing HTML and styles remain unchanged -->
 
 
 <script>
-  $(document).ready(function() {
+  $(document).ready(function () {
     // Enable submit button only if there are no errors
     function enableSubmitButton() {
       var hasErrors = $('.error-message:visible').length > 0;
@@ -154,7 +156,7 @@
     }
 
     // Validation for Discount Amount
-    $('#discountAmount').on('blur', function() {
+    $('#discountAmount').on('blur', function () {
       var discountAmount = $(this).val();
       var errorMessage = '';
 
@@ -167,7 +169,7 @@
     });
 
     // Validation for Valid From and Valid To
-    $('#validFrom, #validTo').on('blur', function() {
+    $('#validFrom, #validTo').on('blur', function () {
       var validFrom = new Date($('#validFrom').val());
       var validTo = new Date($('#validTo').val());
       var errorMessage = '';
@@ -176,34 +178,36 @@
         errorMessage = 'Valid From date must be before Valid To date.';
       }
 
-      $('#couponValidFromError').text(errorMessage).toggle(errorMessage !== '');
+       $('#couponValidFromError').text(errorMessage).toggle(errorMessage !== '');
       enableSubmitButton();
     });
 
-    // Validation for Minimum Margin Amount
-    $('#minimumSpend').on('blur', function() {
+    $('#minimumSpend').on('blur', function () {
       var minimumSpend = $(this).val();
       var errorMessage = '';
 
       if (minimumSpend < 0) {
-        errorMessage = 'Minimum Margin Amount must not be a negative value.';
+        errorMessage = 'Minimum Spend must not be a negative value.';
       }
 
       $('#couponMinimumSpendError').text(errorMessage).toggle(errorMessage !== '');
       enableSubmitButton();
     });
 
-    // Continue adding similar blur event handlers for other fields...
+    $('#usersLimit').on('blur', function () {
+      var usersLimit = $(this).val();
+      var errorMessage = '';
 
-    // Form submission
-    $('#couponForm').on('submit', function() {
-      // Additional server-side validation can be added here
-      // Return false to prevent the form from being submitted if there are errors
-      return !$('.error-message:visible').length > 0;
+      if (usersLimit < 0) {
+        errorMessage = 'User Limit must not be a negative value.';
+      }
+
+      $('#couponUserLimitError').text(errorMessage).toggle(errorMessage !== '');
+      enableSubmitButton();
     });
 
     // Hide error messages after 5 seconds
-    setTimeout(function() {
+    setTimeout(function () {
       $('.error-message').fadeOut();
     }, 5000);
   });

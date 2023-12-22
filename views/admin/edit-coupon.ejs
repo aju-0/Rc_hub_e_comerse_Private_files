@@ -75,73 +75,58 @@
 
 
              
-                 <form class="forms-sample" action="/admin/editcoupon?id=<%= coupon._id %>" method="post" id="productForm">
+               <form class="forms-sample" action="/admin/editcoupon?id=<%= coupon._id %>" method="post" id="productForm">
+  <div class="form-group">
+    <label class="form-label">Coupon Name</label>
+    <input type="text" class="form-control" name="couponName" id="couponName" value="<%= coupon.couponName %>" placeholder="Enter Coupon Name">
+    <div id="couponNameError" style="color: red; margin-left: 15px; font-size: 10px;"></div>
+  </div>
 
-            
-                 
-                    <div class="form-group">
-                      <label class="form-label"">Coupon Name</label>
-                      <input type="text" class="form-control " name="couponName" id="couponName" value="<%= coupon.couponName %>" placeholder="Enter Coupon Name">
-                      <div id="couponNameError" style="color: red;  margin-left: 15px; font-size: 10px;"></div>
-                    </div>
-                
-                
-                    <div class="form-group">
-                      <label class="form-label"">Coupon Code</label>
-                      <input type="text" class="form-control " id="couponCode" name="couponCode" value="<%= coupon.couponCode %>" placeholder="Enter Coupon Code" >
-                      <div id="couponCodeError" style="color: red;  margin-left: 15px; font-size: 10px;"></div>
-                    </div>
-                  
-               
+  <div class="form-group">
+    <label class="form-label">Coupon Code</label>
+    <input type="text" class="form-control" id="couponCode" name="couponCode" value="<%= coupon.couponCode %>" placeholder="Enter Coupon Code">
+    <div id="couponCodeError" style="color: red; margin-left: 15px; font-size: 10px;"></div>
+  </div>
 
-              
-                 
-                    <div class="form-group">
-                      <label class="form-label"">Dicount Amount</label>
-                      <input type="text" class="form-control " name="discountAmount" id="discountAmount" value="<%= coupon.discountAmount %>" placeholder="Enter Dicount Amount" >
-                      <div id="couponDiscountError" style="color: red;  margin-left: 15px; font-size: 10px;"></div>
-                    </div>
-                 
-                  
-                        <div class="form-group">
-                          <label class="form-label"">ValidFrom</label>
-                          <input type="date" class="form-control " name="validFrom" id="validFrom" value="<%=dateFrom.toISOString().slice(0, 10) %>" placeholder="ValidFrom" style="margin-left: 0px;" >
-                          <div id="couponValidFromError" style="color: red;  margin-left: 15px; font-size: 10px;"></div>
-                        </div>
-                  
-                    <div class="form-group">
-                      <label class="form-label">ValidTo</label>
-                      <input type="date" class="form-control " id="validTo" name="validTo" value="<%=dateTo.toISOString().slice(0, 10) %>" placeholder="ValidTo" >
-                      <div id="couponValidToError" style="color: red;  margin-left: 15px; font-size: 10px;"></div>
-                    </div>
-                  
-              
-                    <div class="form-group">
-                      <label class="form-label">minimumSpend</label>
-                      <input type="number" class="form-control " id="minimumSpend" name="minimumSpend" value="<%= coupon.minimumSpend %>" placeholder="Enter Minimum Spend" >
-                      <div id="couponMinimumSpendError" style="color: red;  margin-left: 15px; font-size: 10px;"></div>
-                    </div>
-               
-                
+  <div class="form-group">
+    <label class="form-label">Discount Amount</label>
+    <input type="text" class="form-control" name="discountAmount" id="discountAmount" value="<%= coupon.discountAmount %>" placeholder="Enter Discount Amount">
+    <div id="couponDiscountError" style="color: red; margin-left: 15px; font-size: 10px;"></div>
+  </div>
 
-            
-                   
-                      <div class="form-group">
-                        <label class="form-label">usersLimit</label>
-                        <input type="text" class="form-control " id="usersLimit" name="usersLimit" value="<%= coupon.usersLimit %>" placeholder="Enter User Limit" >
-                        <div id="couponUserLimitError" style="color: red;  margin-left: 15px; font-size: 10px;"></div>
-                      </div>
-                                             
-                   
-                      <div class="form-group">
-                        <label class="form-label">Description</label>
-                        <input type="text" class="form-control " id="description" name="description" value="<%= coupon.description %>" placeholder="Enter Description" >
-                        <div id="couponDiscriptionError" style="color: red;  margin-left: 15px; font-size: 10px;"></div>
-                      </div>
-                  
-                <button type="submit" class="btn btn-lg btn-primary mr-2 mt-5" style="margin-left: 525px; margin-bottom: 15px;">UPDATE COUPON</button>
-              </form>
-                
+  <div class="form-group">
+    <label class="form-label">ValidFrom</label>
+    <input type="date" class="form-control" name="validFrom" id="validFrom" value="<%= dateFrom.toISOString().slice(0, 10) %>" placeholder="ValidFrom" style="margin-left: 0px;">
+    <div id="couponValidFromError" style="color: red; "></div>
+  </div>
+
+  <div class="form-group">
+    <label class="form-label">ValidTo</label>
+    <input type="date" class="form-control" id="validTo" name="validTo" value="<%= dateTo.toISOString().slice(0, 10) %>" placeholder="ValidTo">
+    <div id="couponValidToError" style="color: red; ;"></div>
+  </div>
+
+  <div class="form-group">
+    <label class="form-label">Minimum Spend</label>
+    <input type="number" class="form-control" id="minimumSpend" name="minimumSpend" value="<%= coupon.minimumSpend %>" placeholder="Enter Minimum Spend">
+    <div id="couponMinimumSpendError" style="color: red; "></div>
+  </div>
+
+  <div class="form-group">
+    <label class="form-label">User Limit</label>
+    <input type="text" class="form-control" id="usersLimit" name="usersLimit" value="<%= coupon.usersLimit %>" placeholder="Enter User Limit">
+    <div id="couponUserLimitError" style="color: red; "></div>
+  </div>
+
+  <div class="form-group">
+    <label class="form-label">Description</label>
+    <input type="text" class="form-control" id="description" name="description" value="<%= coupon.description %>" placeholder="Enter Description">
+    <div id="couponDiscriptionError" style="color: red; "></div>
+  </div>
+
+  <button type="submit" class="btn btn-primary mr-2" id="update_button" disabled>UPDATE COUPON</button>
+</form>
+   
               </div>
             </div>
           </div>
@@ -157,6 +142,71 @@
      <!-- page-body-wrapper ends -->
    </div>
    <!-- container-scroller -->
+   
+ <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script>
+  $(document).ready(function () {
+    function enableSubmitButton() {
+      var hasErrors = $('.error-message:visible').length > 0;
+      $('#update_button').prop('disabled', hasErrors);
+    }
+
+    $('#discountAmount').on('blur', function () {
+      var discountAmount = $(this).val();
+      var errorMessage = '';
+
+      if (discountAmount < 50 || discountAmount < 0) {
+        errorMessage = 'Discount Amount must be more than 50 and not a negative value.';
+      }
+
+      $('#couponDiscountError').text(errorMessage).toggle(errorMessage !== '');
+      enableSubmitButton();
+    });
+
+    $('#validFrom, #validTo').on('blur', function () {
+      var validFrom = new Date($('#validFrom').val());
+      var validTo = new Date($('#validTo').val());
+      var errorMessage = '';
+
+      if (validFrom >= validTo) {
+        errorMessage = 'Valid From date must be before Valid To date.';
+      }
+
+      $('#couponValidFromError').text(errorMessage).toggle(errorMessage !== '');
+      enableSubmitButton();
+    });
+
+    $('#minimumSpend').on('blur', function () {
+      var minimumSpend = $(this).val();
+      var errorMessage = '';
+
+      if (minimumSpend < 0) {
+        errorMessage = 'Minimum Spend must not be a negative value.';
+      }
+
+      $('#couponMinimumSpendError').text(errorMessage).toggle(errorMessage !== '');
+      enableSubmitButton();
+    });
+
+    $('#usersLimit').on('blur', function () {
+      var usersLimit = $(this).val();
+      var errorMessage = '';
+
+      if (usersLimit < 0) {
+        errorMessage = 'User Limit must not be a negative value.';
+      }
+
+      $('#couponUserLimitError').text(errorMessage).toggle(errorMessage !== '');
+      enableSubmitButton();
+    });
+
+    setTimeout(function () {
+      $('.error-message').fadeOut();
+      enableSubmitButton();
+    }, 5000);
+  });
+</script>
+
 
 
 <%- include("../layouts/adminfooter.ejs") %>

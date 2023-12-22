@@ -114,57 +114,59 @@
                 <h4 class="card-title">Edit Product <%= product.productName %>    </h4>
                 <img class="rounded-circle" src="/images/products/<%= product.coverPic[0]%>" alt="" style="width: 60px; height: 60px;">  
                 <p class="card-description"></p>
- <form class="forms-sample" action="" method="post" enctype="multipart/form-data">
-                  <div class="form-group">
-                      <label class="form-label">ProductName</label>
-                      <input type="text" class="form-control" name="productName" value="<%= product.productName %>" required>
-                  </div>
-                  <div class="form-group">
-                      <label class="form-label">Description</label>
-                      <input type="text" class="form-control" name="description" value="<%= product.description %>" required>
-                  </div>
-                  <div class="form-group">
-                      <label class="form-label">Category</label>
-                      <select class="form-control" id="category" name="category" required>
-                          <% category.forEach(category => { %>
-                              <option value="<%= category._id %>"><%= category.categoryName %></option>
-                          <% }); %>
-                      </select>
-                  </div>
-                  <div class="form-group">
-                      <label class="form-label">Color</label>
-                      <input type="text" class="form-control" name="color" value="<%= product.color %>" required>
-                  </div>
-                  <div class="form-group">
-                      <label class="form-label">Price</label>
-                      <input type="number" class="form-control" name="price" value="<%= product.price %>" required>
-                  </div>
-                  <div class="form-group">
-                    <label class="form-label">Brand</label>
-                    <select class="form-control" id="category" name="brand" required>
-                        <% brand.forEach(brand => { %>
-                            <option value="<%= brand._id %>"><%= brand.brandName %></option>
-                        <% }); %>
-                    </select>
-                </div>
-                <div class="form-group">
-                  <label class="form-label">Quantity</label>
-                  <input type="number" class="form-control" name="quantity" value="<%= product.quantity %>" required>
-                </div>
-                
-                 
-              
-                <div class="form-group">
-                  <label class="form-label">Status</label>
-                  <br>
-                  <label>Active</label>
-                  <input type="radio" name="is_block" value="1" <% if(product.is_block == 1){ %> checked <% } %>>
-                  <label>Block</label>
-                  <input type="radio" name="is_block" value="0" <% if(product.is_block == 0){ %> checked <% } %>>
-                </div>
-                <input type="hidden" name="id" value="<%= product._id %>">
-                <button type="submit" class="btn btn-primary mr-2">Update Product</button>
-              </form>
+<form class="forms-sample" action="" method="post" enctype="multipart/form-data" id="productForm">
+  <div class="form-group">
+    <label class="form-label">ProductName</label>
+    <input type="text" class="form-control" name="productName" value="<%= product.productName %>" required>
+  </div>
+  <div class="form-group">
+    <label class="form-label">Description</label>
+    <input type="text" class="form-control" name="description" value="<%= product.description %>" required>
+  </div>
+  <div class="form-group">
+    <label class="form-label">Category</label>
+    <select class="form-control" id="category" name="category" required>
+      <% category.forEach(category => { %>
+      <option value="<%= category._id %>"><%= category.categoryName %></option>
+      <% }); %>
+    </select>
+  </div>
+  <div class="form-group">
+    <label class="form-label">Color</label>
+    <input type="text" class="form-control" name="color" value="<%= product.color %>" required>
+  </div>
+  <div class="form-group">
+    <label class="form-label">Price</label>
+    <input type="number" class="form-control" name="price" id="price" value="<%= product.price %>" required>
+    <div id="priceError" class="error-message text-danger"></div>
+  </div>
+  <div class="form-group">
+    <label class="form-label">Brand</label>
+    <select class="form-control" id="category" name="brand" required>
+      <% brand.forEach(brand => { %>
+      <option value="<%= brand._id %>"><%= brand.brandName %></option>
+      <% }); %>
+    </select>
+  </div>
+  <div class="form-group">
+    <label class="form-label">Quantity</label>
+    <input type="number" class="form-control" name="quantity" id="quantity" value="<%= product.quantity %>" required>
+    <div id="quantityError" class="error-message text-danger"></div>
+  </div>
+  <div class="form-group">
+    <label class="form-label">Status</label>
+    <br>
+    <label>Active</label>
+    <input type="radio" name="is_block" value="1" <% if(product.is_block == 1){ %> checked <% } %>>
+    <label>Block</label>
+    <input type="radio" name="is_block" value="0" <% if(product.is_block == 0){ %> checked <% } %>>
+  </div>
+  <input type="hidden" name="id" value="<%= product._id %>">
+  <button type="submit" class="btn btn-primary mr-2" id="updateProductBtn" disabled>Update Product</button>
+</form>
+
+
+
              
               </div>
             </div>
@@ -219,8 +221,52 @@
      <!-- page-body-wrapper ends -->
    </div>
    <!-- container-scroller -->
-   <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+   
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+
+<script>
+  $(document).ready(function () {
+    // Enable submit button only if there are no errors
+    function enableSubmitButton() {
+      var hasErrors = $('.error-message:visible').length > 0;
+      $('#updateProductBtn').prop('disabled', hasErrors);
+    }
+
+    // Validation for Price
+    $('#price').on('blur', function () {
+      var price = $(this).val();
+      var errorMessage = '';
+
+      if (price < 10) {
+        errorMessage = 'Price must be at least 10.';
+      }
+
+      $('#priceError').text(errorMessage).toggle(errorMessage !== '');
+      enableSubmitButton();
+    });
+
+    // Validation for Quantity
+    $('#quantity').on('blur', function () {
+      var quantity = $(this).val();
+      var errorMessage = '';
+
+      if (quantity < 10) {
+        errorMessage = 'Quantity must be at least 10.';
+      }
+
+      $('#quantityError').text(errorMessage).toggle(errorMessage !== '');
+      enableSubmitButton();
+    });
+
+    // Hide error messages after 5 seconds
+    setTimeout(function () {
+      $('.error-message').fadeOut();
+    }, 5000);
+  });
+</script>
 
 
 

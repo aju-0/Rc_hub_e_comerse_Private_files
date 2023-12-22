@@ -275,6 +275,7 @@ const loadHome = async (req, res) => {
 const userLogout = async (req, res) => {
   try {
     req.session.destroy();
+    
     res.redirect("/");
    } catch (error) {console.log(error.message);
     throw new Error(error);

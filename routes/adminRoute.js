@@ -76,11 +76,7 @@ adminRoute.patch(
   productController.uploadImage
 );
 // Category Dashboard Routes
-adminRoute.get(
-  "/categoryDashboard",
-  auth.isLogin,
-  categoryController.categoryDashboard
-);
+adminRoute.get("/categoryDashboard",auth.isLogin,categoryController.categoryDashboard);
 adminRoute.get(
   "/new-category",
   auth.isLogin,

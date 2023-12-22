@@ -27,22 +27,22 @@ app.use("/docs", express.static(path.join(__dirname, "docs")));
 
 // app.use(nocache());
 
-// const disableBackButton = (req, res, next) => {
-//     res.setHeader('Cache-Control', 'no-cache, no-store,must-revalidate');
-//     res.setHeader('Pragma', 'no-cache');
-//     res.setHeader('Expires', '1');
-//       next();
-//   };
+const disableBackButton = (req, res, next) => {
+    res.setHeader('Cache-Control', 'no-cache, no-store,must-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '1');
+      next();
+  };
 
 
 //for user routes
 const userRoute = require('./routes/userRoute');
-app.use('/',userRoute);
+app.use("/", disableBackButton,userRoute);
 
 
 //for admin routes
 const adminRoute = require('./routes/adminRoute');
-app.use('/admin',adminRoute);
+app.use("/admin", disableBackButton,adminRoute);
 
 app.set("view engine", "ejs");
 app.set("views", "./views/errors");

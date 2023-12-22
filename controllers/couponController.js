@@ -244,6 +244,67 @@ const deleteAppliedCoupon = async (req, res) => {
   }
 };
 
+
+
+const ApplyreferralCode = async (req, res) => {
+  try {
+    const userId = req.session.user_id;
+    const user = await userDb.findOne({ _id: userId });
+    const code = req.body.code;
+    const friend = await userDb.findOne({ referralCode: code });
+
+    if (code === user.referralCode) {
+      res.json({ referralCodeOkay: false });
+    } else if (friend) {
+      const userWalletHistory = {
+        transactionDate: new Date(),
+        transactionDetails: `Welcome referral of ${friend.name}`,
+        transactionType: "Credit",
+        transactionAmount: 100,
+        currentBalance: !isNaN(user.wallet) ? user.wallet + 100 : 100,
+      };
+      const friendWalletHistory = {
+        transactionDate: new Date(),
+        transactionDetails: `Referred by ${user.name} `,
+        transactionType: "Credit",
+        transactionAmount: 100,
+        currentBalance: !isNaN(friend.wallet) ? friend.wallet + 100 : 100,
+      };
+
+      const userUpdate = await userDb.updateOne(
+        { _id: userId },
+        {
+          $set: { isReferralUsed: 1 },
+          $inc: { wallet: 100, referralAmountCredited: 100 },
+          $push: { walletHistory: userWalletHistory },
+        }
+      );
+
+      const friendUpdate = await userDb.updateOne(
+        { referralCode: code },
+        {
+          $inc: {
+            wallet: 100,
+            userReferralUsed: 1,
+            referralAmountCredited: 100,
+            userReferralUsed:1,
+          },
+          $push: { walletHistory: friendWalletHistory },
+        }
+      );
+
+      res.json({ referralCodeOkay: true });
+    } else {
+      res.json({ referralCodeOkay: false });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+module.exports = ApplyreferralCode;
+
 module.exports = {
   loadCouponMangements,
   loadAddCouponMangements,
@@ -251,7 +312,7 @@ module.exports = {
   addNewCoupon,
   editCoupon,
   deleteCoupon,
-  
   ApplyCoupon,
   deleteAppliedCoupon,
+  ApplyreferralCode,
 };

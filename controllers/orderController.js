@@ -14,6 +14,7 @@ const fs = require("fs");
 const pdf = require("pdf-creator-node");
 const path = require("path");
 const options = require("../helpers/options");
+const { loginLoad } = require("./userController");
 
 
 
@@ -470,93 +471,33 @@ const orderDetails = async (req, res) => {
 // generating PDF Invoice
 
 const generatePdf = async (req, res, next) => {
-  
-  const html = fs.readFileSync(
-    path.join(__dirname, "../views/users/template.html"),
-    "utf-8"
-  );
-  const filename = Math.random() + "_doc" + ".pdf";
+  try {
+    const userId = req.session.user_id;
+    const userData = await userDb.findById({ _id: userId });
 
-  const userId = req.session.user_id;
-  const userData = await userDb.findById({ _id: userId });
-  const id = req.query.id;
+    const id = req.query.id;
 
-// console.log(id);
-const orderedProduct = await orderDb
-  .findOne({ _id: id })
-  .populate("products.productId");
-//  console.log("orderedProduct:",orderedProduct)
+    // console.log(id);
+    const orderedProduct = await orderDb
+      .findOne({ _id: id })
+      .populate("products.productId");
 
-  const cart = await cartDb.findOne({ user: req.session.user_id });
-  let cartCount = 0;
-  if (cart) {
-    cartCount = cart.products.length;
-  }
-// making passing Data
-const userName = userData.name;
-const address = orderedProduct.deliveryDetails;
-const invoiceId = orderedProduct.uniqueId;
-const paymentMethod = orderedProduct.paymentMethod;
-const expectedDelivery = orderedProduct.expectedDelivery;
-const createdAt = orderedProduct.createdAt;
-const totalAmount = orderedProduct.totalAmount;
-
-const currentDate = new Date();
-
-  let array = [];
-  let totalSubTotal = 0;
-  orderedProduct.products.forEach((d) => {
-    // Skip products with OrderStatus "Cancelled"
-    if (d.OrderStatus !== "Cancelled") {
-      const prod = {
-        product: d.productId.productName,
-        productCoverPic: d.productId.coverPic[0],
-        price: d.productId.price,
-        quantity: d.quantity,
-        paymentStatus: d.paymentStatus,
-        subTotal: d.productId.price * d.quantity,
-      };
-      array.push(prod);
-      totalSubTotal += prod.subTotal;
+    const cart = await cartDb.findOne({ user: req.session.user_id });
+    let cartCount = 0;
+    // let wishCount=0;
+    if (cart) {
+      cartCount = cart.products.length;
     }
-  });
-  
 
-
-
-  const obj = {
-    invoiceId: invoiceId,
-    address: address,
-    name: userName,
-    paymentMethod: paymentMethod,
-    prodlist: array,
-    expectedDelivery: expectedDelivery,
-    createdAt: createdAt,
-    totalAmount: totalSubTotal,
-    currentDate: currentDate,
-  };
-  const document = {
-    html: html,
-    data: {
-      products: obj,
-    
-    },
-    path: "./docs/" + filename,
-  };
-  pdf
-    .create(document, options)
-    .then((res) => {
-      console.log(res);
-    })
-    .catch((error) => {
-      console.log(error);
+    res.render("invoice", {
+      user: userData,
+      orders: orderedProduct,
+      cartCount,
     });
-  const filepath = "https://rc-hub-ecomerse.onrender.com/docs/" + filename;
-
-  res.render("download", {
-    path: filepath,user:userData
-
-  });
+  } catch (error) {
+    console.log(error.message);
+    throw new Error(error);
+  }
 };
 
 

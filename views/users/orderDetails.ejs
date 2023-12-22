@@ -287,20 +287,59 @@
       <div class="card mt-4 border-2 shadow">
          <div class="card-body">
           
-        <% if (orders && orders.products && orders.products.length > 0) { %>
+  <% if (orders && orders.products && orders.products.length > 0) { %>
   <h5>Total Amount</h5>
-  <% orders.products.forEach((products, i) => {  %>
-    <h6><%= products.productId.productName %> * (<%= products.quantity %>) : ₹ <%= (products.productSalePrice) * (products.quantity) %></h6>
-  <% }) %>
-  <h6>Discount: ₹<%= orders.discount ? orders.discount : 0 %></h6>
-  <h6>Total Amount:₹ <%= orders.totalAmount %></h6>
-<% } %>
+<% orders.products.forEach((product, i) => { %>
+  <h6>
+    <%= product.productId.productName %> * (<%= product.quantity %>) :
+    ₹ <%= (product.productSalePrice) * (product.quantity) %>
+
+    <% if (product.OrderStatus =="Cancelled") { %>
+    <span class="text-danger">(cancelled)</span>  
+    <% } %>
+  </h6>
+<% }) %>
+
+
+  
+
+  <% orders.products.forEach((product, i) => { %>
+  <h6>
+    
+  </h6>
+<% }) %>
+<%
+  let amount = orders.totalAmount;
+  orders.products.forEach((product, i) => {
+    if (product.OrderStatus === "Cancelled") {
+      amount -= (product.productSalePrice) * (product.quantity);
+%>
+      <h6>
+        <%= product.productId.productName %> * (<%= product.quantity %>) :
+        ₹ - <%= (product.productSalePrice) * (product.quantity) %> (Cancelled)
+      </h6>
+<%
+    }
+  });
+%>
+<h6>Discount: ₹<%= orders.discount ? orders.discount : 0 %></h6>
+<!-- Render the total amount -->
+<h6>Total Amount: ₹ <%= amount %></h6>
+  
+  <% } %>
 
 
            <h5 class="mb-4">Shipping Address</h5>
            <p><%= orders.deliveryDetails %></p>
          </div>
        </div>
+
+
+
+
+
+
+
        <div class="text-center mt-4">
          <a href="/shop" class="btn primary-btn rounded continue-btn mb-4"><i class="bi bi-house-door"></i> Continue Shopping</a>
        </div>

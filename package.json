@@ -23,6 +23,7 @@
     "express-session": "^1.17.2",
     "helmet": "^7.1.0",
     "install": "^0.13.0",
+    "jspdf": "^2.5.1",
     "mongodb": "^4.4.0",
     "mongoose": "^6.2.4",
     "morgan": "^1.10.0",

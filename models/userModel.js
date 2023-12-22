@@ -25,6 +25,24 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+
+    referralCode: {
+      type: String,
+      default: "",
+    },
+    isReferralUsed: {
+      type: Number,
+      default: 0,
+    },
+    userReferralUsed: {
+      type: Number,
+      default: 0,
+    },
+    referralAmountCredited: {
+      type: Number,
+      default: 0,
+    },
+
     is_admin: {
       type: Number,
       required: true,

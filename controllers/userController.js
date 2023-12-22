@@ -48,7 +48,7 @@ const sendVerifyMail = async (name, email, user_id) => {
       html:
         "<p>Hii" +
         name +
-        ', please click here to <a href="https://rc-hub-ecomerse.onrender.com/verify?id=' +
+        ', please click here to <a href="http://127.0.0.1:5000/verify?id=' +
         user_id +
         '"> Verify </a> your mail.</p>',
     };
@@ -84,7 +84,7 @@ const sendResetPasswordMail = async (name, email, token) => {
       html:
         "<p>Hii " +
         name +
-        ', please click here to <a href="https://rc-hub-ecomerse.onrender.com/forget-password?token=' +
+        ', please click here to <a href="http://127.0.0.1:5000/forget-password?token=' +
         token +
         '"> Reset </a> your password.</p>',
     };
@@ -107,12 +107,31 @@ const loadRegister = async (req, res) => {
     throw new Error(error);
   }
 };
+// Function to generate a random 6-digit number
+function generateRandomReferralCode() {
+  const randomNumber = Math.floor(100000 + Math.random() * 900000);
+  const randomChars =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+  // Generate additional characters to make it a 10-character code
+  let additionalChars = "";
+  for (let i = 0; i < 4; i++) {
+    const randomIndex = Math.floor(Math.random() * randomChars.length);
+    additionalChars += randomChars.charAt(randomIndex);
+  }
+
+  // Combine the random number and additional characters
+  const referralCode = "welcome" + randomNumber.toString() + additionalChars;
+  return referralCode;
+}
 
 const insertUser = async (req, res) => {
   try {
     const spassword = await securePassword(req.body.password);
     const existingUserEmail = await User.findOne({ email: req.body.email });
     const existingUserMobile = await User.findOne({ mobile: req.body.mno });
+    const referralCode = generateRandomReferralCode();
+    
 
     if (existingUserEmail) {
       return res.render("registration", {
@@ -136,6 +155,7 @@ const insertUser = async (req, res) => {
       mobile: req.body.mno,
       image: req.file.filename,
       password: spassword,
+      referralCode:referralCode,
       is_admin: 0,
     });
 
@@ -617,21 +637,41 @@ const editLoad = async (req, res) => {
 
     const userData = await User.findById({ _id: id });
     const userAddress = await Address.find({ userId: id });
-    const coupons = await couponDb.find({status:true});
+    const coupons = await couponDb.find({ status: true });
 
+    console.log("User Data:", userData);
+
+    let referralHistory = []; // Initialize referralHistory here
+
+    if (userData.walletHistory) {
+      console.log("All Wallet History:", userData.walletHistory);
+
+      referralHistory = userData.walletHistory.filter(
+        (entry) =>
+          entry.transactionDetails.startsWith("Referred") ||
+          entry.transactionDetails.startsWith("Welcome")
+      );
+
+      console.log("Referral History:", referralHistory);
+    } else {
+      console.log("User not found or no wallet history");
+    }
 
     if (userData) {
       res.render("edit", {
         user: userData,
         address: userAddress,
         coupons: coupons,
+        referralHistory: referralHistory,
       });
     } else {
       res.redirect("/home");
     }
-   } catch (error) {console.log(error.message);
+  } catch (error) {
+    console.log(error.message);
     throw new Error(error);
   }
+
 };
 
 // Update the controller to return the updated user data

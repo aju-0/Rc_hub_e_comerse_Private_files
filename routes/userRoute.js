@@ -147,4 +147,7 @@ userRoute.post(
 userRoute.post("/couponApply", auth.isLogin, couponController.ApplyCoupon);
 userRoute.post("/deleteCoupon", auth.isLogin,couponController.deleteAppliedCoupon);
 
+
+userRoute.post("/referralCodeApply",auth.isLogin,couponController.ApplyreferralCode);
+
 module.exports = userRoute;

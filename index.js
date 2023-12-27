@@ -15,7 +15,7 @@ const express = require("express");
 const app = express();
 const path=require('path')
 dbConnect.dbConnect();
-// app.use(morgan("dev"))
+app.use(morgan("dev"))
 //loading assets
 
 app.use('/admin',express.static(path.join(__dirname,"public/admin")))

@@ -8,6 +8,7 @@ const { ObjectId } = require("mongoose").Types;
 const Razorpay = require('razorpay')
 const crypto = require("crypto");
 const { log } = require("console");
+const Category = require("../models/categoryModel");
 
 // pdf Generator
 var instance = new Razorpay({
@@ -25,7 +26,11 @@ const loadCheckOut = async (req, res) => {
       .populate("products.productId")
       .exec();
     const products = cartData.products;
-    const cart = await cartDb.findOne({ user: userId });
+    const cart = await cartDb
+      .findOne({ user: userId })
+      .populate("products.productId")
+      .exec();
+    const categoryData = await Category.find().populate("offer").exec();
     let cartQuantity = 0;
     if (cart) {
       cartQuantity = cart.products.length;
@@ -87,6 +92,8 @@ const loadCheckOut = async (req, res) => {
             
             res.render("checkout", {
               userId: userId,
+              category: categoryData,
+              cart: cart,
               products: products,
               total: Total,
               totalamount,
@@ -399,11 +406,18 @@ const orderPlacedPageLoad = async (req, res) => {
     const userId = req.session.user_id;
 
     const userData = await userDb.findOne({ _id: userId });
+    const categoryData = await Category.find().populate("offer").exec();
+    const cart = await cartDb.findOne({ user: req.session.user_id })
+      .populate("products.productId")
+      .exec();
+
     // console.log("i am here");
     // console.log(userData);
 
     res.render("orderPlaced", {
       user: userData,
+      category: categoryData,
+      cart: cart,
     }); // Pass the order data to the vie
   } catch (error) {
     console.log(error);
@@ -413,8 +427,13 @@ const orderPlacedPageLoad = async (req, res) => {
 const loadOrderPage = async (req, res) => {
   try {
     const userId = req.session.user_id;
-    const cart = await cartDb.findOne({ user: userId });
+    const categoryData = await Category.find().populate("offer").exec();
+    const cart = await cartDb.findOne({ user: req.session.user_id })
+      .populate("products.productId")
+      .exec();
+
     const userData = await userDb.findById({ _id: userId });
+    
     let cartCount = 0;
 
     if (cart) {
@@ -425,7 +444,13 @@ const loadOrderPage = async (req, res) => {
 
     // console.log("orderData :",orderData);
 
-    res.render("orders", { user: userData, orders: orderData, cartCount });
+    res.render("orders", {
+      user: userData,
+      category: categoryData,
+      cart: cart,
+      orders: orderData,
+      cartCount,
+    });
   } catch (error) {
     console.log(error);
   }
@@ -436,6 +461,7 @@ const orderDetails = async (req, res) => {
     const userId = req.session.user_id;
     const userData = await userDb.findById({ _id: userId });
     
+    
     const id = req.query.id;
 
     // console.log(id);
@@ -443,7 +469,11 @@ const orderDetails = async (req, res) => {
       .findOne({ _id: id })
       .populate("products.productId");
 
-    const cart = await cartDb.findOne({ user: req.session.user_id });
+    const categoryData = await Category.find().populate("offer").exec();
+    const cart = await cartDb.findOne({ user: req.session.user_id })
+      .populate("products.productId")
+      .exec();
+
     let cartCount = 0;
     // let wishCount=0;
     if (cart) {
@@ -452,6 +482,8 @@ const orderDetails = async (req, res) => {
 
     res.render("orderDetails", {
       user: userData,
+      category: categoryData,
+      cart: cart,
       orders: orderedProduct,
       cartCount,
     });
@@ -466,6 +498,7 @@ const generatePdf = async (req, res, next) => {
   try {
     const userId = req.session.user_id;
     const userData = await userDb.findById({ _id: userId });
+    
 
     const id = req.query.id;
 
@@ -474,7 +507,11 @@ const generatePdf = async (req, res, next) => {
       .findOne({ _id: id })
       .populate("products.productId");
 
-    const cart = await cartDb.findOne({ user: req.session.user_id });
+    const categoryData = await Category.find().populate("offer").exec();
+    const cart = await cartDb.findOne({ user: req.session.user_id })
+      .populate("products.productId")
+      .exec();
+
     let cartCount = 0;
     // let wishCount=0;
     if (cart) {
@@ -483,6 +520,9 @@ const generatePdf = async (req, res, next) => {
 
     res.render("invoice", {
       user: userData,
+      category: categoryData,
+      cart: cart,
+
       orders: orderedProduct,
       cartCount,
     });

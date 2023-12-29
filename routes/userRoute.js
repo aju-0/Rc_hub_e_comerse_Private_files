@@ -17,21 +17,22 @@ userRoute.use(express.json());
 userRoute.use(express.urlencoded({ extended: true }));
 userRoute.use(express.static("public"));
 
-// Verification Routes
-userRoute.get("/register", auth.isLogout, userController.loadRegister);
-userRoute.post(
-  "/register",
-  imageUploader.uploadUser.single("image"),
-  imageUploader.userImgResize,
-  userController.insertUser
-);
-userRoute.get("/verify", userController.verifyMail);
+
 
 // Login Routes
-userRoute.get("/", auth.isLogout, userController.loginLoad);
+userRoute.get("/", auth.isLogout, userController.loadHome);
 userRoute.get("/login", auth.isLogout, userController.loginLoad);
 userRoute.post("/login", userController.verifyLogin);
 userRoute.get("/logout",  auth.isLogin,auth.checkBlock, userController.userLogout);
+
+
+
+// Verification Routes
+userRoute.get("/register", auth.isLogout, userController.loadRegister);
+userRoute.post("/register",imageUploader.uploadUser.single("image"),imageUploader.userImgResize,userController.insertUser);
+userRoute.get("/verify", userController.verifyMail);
+
+
 
 // Forget Password Routes
 userRoute.get("/forget", auth.isLogout, userController.forgetLoad);
@@ -65,14 +66,14 @@ userRoute.post(
 );
 
 // Shop Route
-userRoute.get("/shop",  auth.isLogin,auth.checkBlock, userController.shopLoad);
+userRoute.get("/shop", userController.shopLoad);
 
 // Contact Routes
 userRoute.get("/contact", auth.isLogin,auth.checkBlock,contactController.contactLoad);
-userRoute.post("/contact",  auth.isLogin,auth.checkBlock, contactController.newContact);
+userRoute.post("/contact",auth.checkBlock, contactController.newContact);
 
 // Wish List Route
-userRoute.get("/wishList",  auth.isLogin,auth.checkBlock, userController.wishListLoad);
+userRoute.get("/wishList",auth.checkBlock, userController.wishListLoad);
 
 // Address Routes
 userRoute.post("/address",  auth.isLogin,auth.checkBlock, userController.addAddress);
@@ -89,7 +90,7 @@ userRoute.post(
 
 // Single Product Route
 userRoute.get(
-  "/singleProduct/:id", auth.isLogin,auth.checkBlock,userController.singleProductLoad
+  "/singleProduct/:id",userController.singleProductLoad
 );
 
 // Cart Routes

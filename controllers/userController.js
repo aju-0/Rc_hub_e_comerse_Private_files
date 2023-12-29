@@ -100,7 +100,12 @@ const sendResetPasswordMail = async (name, email, token) => {
 
 const loadRegister = async (req, res) => {
   try {
-    res.render("registration");
+    const categoryData = await Category.find().populate("offer").exec();
+    const cart = await Cart.findOne({ user: req.session.user_id })
+      .populate("products.productId")
+      .exec();
+
+    res.render("registration", { cart: cart, category: categoryData });
    } catch (error) {console.log(error.message);
     throw new Error(error);
   }
@@ -129,17 +134,26 @@ const insertUser = async (req, res) => {
     const existingUserEmail = await User.findOne({ email: req.body.email });
     const existingUserMobile = await User.findOne({ mobile: req.body.mno });
     const referralCode = generateRandomReferralCode();
+    const categoryData = await Category.find().populate("offer").exec();
+    const cart = await Cart.findOne({ user: req.session.user_id })
+      .populate("products.productId")
+      .exec();
+
     
 
     if (existingUserEmail) {
       return res.render("registration", {
         emailMessage: "Email already exists.",
+        cart: cart,
+        category: categoryData,
       });
     }
 
     if (existingUserMobile) {
       return res.render("registration", {
         emailMessage: "Mobile number already exists.",
+        cart: cart,
+        category: categoryData,
       });
     }
 
@@ -164,27 +178,40 @@ const insertUser = async (req, res) => {
       res.render("registration", {
         message:
           "Your registration has been successful. Please verify your email.",
+        cart: cart,
+        category: categoryData,
       });
     } else {
-      res.render("registration", { message: "Your registration has failed." });
+      res.render("registration", {
+        message: "Your registration has failed.",
+        cart: cart,
+        category: categoryData,
+      });
     }
    } catch (error) {console.log(error.message);
     throw new Error(error);
     res.render("registration", {
       message: "An error occurred during registration.",
+      cart: cart,
+      category: categoryData,
     });
   }
 };
 
 const verifyMail = async (req, res) => {
   try {
+    const categoryData = await Category.find().populate("offer").exec();
+    const cart = await Cart.findOne({ user: req.session.user_id })
+      .populate("products.productId")
+      .exec();
+
     const updateInfo = await User.updateOne(
       { _id: req.query.id },
       { $set: { is_varified: 1 } }
     );
 
     console.log(updateInfo);
-    res.render("email-verified");
+    res.render("email-verified", { cart: cart, category: categoryData });
    } catch (error) {console.log(error.message);
     throw new Error(error);
   }
@@ -194,7 +221,12 @@ const verifyMail = async (req, res) => {
 
 const loginLoad = async (req, res) => {
   try {
-    res.render("login");
+    const categoryData = await Category.find().populate("offer").exec();
+    const cart = await Cart.findOne({ user: req.session.user_id })
+      .populate("products.productId")
+      .exec();
+
+    res.render("login", { cart: cart, category: categoryData });
    } catch (error) {console.log(error.message);
     throw new Error(error);
   }
@@ -202,6 +234,11 @@ const loginLoad = async (req, res) => {
 
 const verifyLogin = async (req, res) => {
   try {
+    const categoryData = await Category.find().populate("offer").exec();
+    const cart = await Cart.findOne({ user: req.session.user_id })
+      .populate("products.productId")
+      .exec();
+
     const email = req.body.email;
     const password = req.body.password;
 
@@ -211,9 +248,17 @@ const verifyLogin = async (req, res) => {
       const passwordMatch = await bcrypt.compare(password, userData.password);
       if (passwordMatch) {
         if (userData.is_varified === 0) {
-          res.render("login", { message: "Please verify your mail." });
+          res.render("login", {
+            message: "Please verify your mail.",
+            cart: cart,
+            category: categoryData,
+          });
         } else if (userData.is_block === 0) {
-          res.render("login", { message: "Blocked By Admin" });
+          res.render("login", {
+            message: "Blocked By Admin",
+            cart: cart,
+            category: categoryData,
+          });
         } else {
           req.session.user_id = userData._id;
           res.redirect("/home");
@@ -221,10 +266,16 @@ const verifyLogin = async (req, res) => {
       } else {
         res.render("login", {
           message: "Email and password is incorrect ",
+          cart: cart,
+          category: categoryData,
         });
       }
     } else {
-      res.render("login", { message: "Email and password is incorrect" });
+      res.render("login", {
+        message: "Email and password is incorrect",
+        cart: cart,
+        category: categoryData,
+      });
     }
    } catch (error) {console.log(error.message);
     throw new Error(error);
@@ -233,10 +284,12 @@ const verifyLogin = async (req, res) => {
 
 const loadHome = async (req, res) => {
   try {
-    const userData = await User.findById(req.session.user_id);
+    let userData;
+    if (req.session.user_id) {
+      userData = await User.findById(req.session.user_id);
+    }
 
     const brandData = await Brand.find();
-
     const productData = await Product.find()
       .populate("brand category offer")
       .populate({
@@ -249,27 +302,28 @@ const loadHome = async (req, res) => {
     const bannerData = await Banner.find({ is_block: true })
       .populate("product")
       .exec();
-
-      
-
-    const categoryData = await Category.find().populate("offer").exec();;
-
+    const categoryData = await Category.find().populate("offer").exec();
     const cart = await Cart.findOne({ user: req.session.user_id })
       .populate("products.productId")
       .exec();
 
+    // Render the view with the data
     res.render("home", {
-      user: userData,
+      user: userData, // This will be undefined if there's no user_id in the session
       brand: brandData,
       category: categoryData,
       product: productData,
       cart: cart,
       banner: bannerData,
     });
-   } catch (error) {console.log(error.message);
-    throw new Error(error);
+  } catch (error) {
+    console.log(error.message);
+    // Handle the error appropriately, e.g., send an error response
+    res.status(500).send("Internal Server Error");
   }
 };
+
+
 
 // logout
 const userLogout = async (req, res) => {
@@ -286,7 +340,12 @@ const userLogout = async (req, res) => {
 
 const forgetLoad = async (req, res) => {
   try {
-    res.render("forget");
+    const categoryData = await Category.find().populate("offer").exec();
+    const cart = await Cart.findOne({ user: req.session.user_id })
+      .populate("products.productId")
+      .exec();
+
+    res.render("forget", { cart: cart, category: categoryData });
    } catch (error) {console.log(error.message);
     throw new Error(error);
   }
@@ -296,9 +355,18 @@ const forgetVerify = async (req, res) => {
   try {
     const email = req.body.email;
     const userData = await User.findOne({ email: email });
+    const categoryData = await Category.find().populate("offer").exec();
+    const cart = await Cart.findOne({ user: req.session.user_id })
+      .populate("products.productId")
+      .exec();
+
     if (userData) {
       if (userData.is_varified === 0) {
-        res.render("forget", { message: "Please verify your mail." });
+        res.render("forget", {
+          message: "Please verify your mail.",
+          cart: cart,
+          category: categoryData,
+        });
       } else {
         const randomString = randormstring.generate();
         const updatedData = await User.updateOne(
@@ -308,10 +376,16 @@ const forgetVerify = async (req, res) => {
         sendResetPasswordMail(userData.name, userData.email, randomString);
         res.render("forget", {
           message: "Please check your mail to reset your password.",
+          cart: cart,
+          category: categoryData,
         });
       }
     } else {
-      res.render("forget", { message: "User email is incorrect." });
+      res.render("forget", {
+        message: "User email is incorrect.",
+        cart: cart,
+        category: categoryData,
+      });
     }
    } catch (error) {console.log(error.message);
     throw new Error(error);
@@ -322,10 +396,23 @@ const forgetPasswordLoad = async (req, res) => {
   try {
     const token = req.query.token;
     const tokenData = await User.findOne({ token: token });
+    const categoryData = await Category.find().populate("offer").exec();
+    const cart = await Cart.findOne({ user: req.session.user_id })
+      .populate("products.productId")
+      .exec();
+
     if (tokenData) {
-      res.render("forget-password", { user_id: tokenData._id });
+      res.render("forget-password", {
+        user_id: tokenData._id,
+        cart: cart,
+        category: categoryData,
+      });
     } else {
-      res.render("404", { message: "Token is invalid." });
+      res.render("404", {
+        message: "Token is invalid.",
+        cart: cart,
+        category: categoryData,
+      });
     }
    } catch (error) {console.log(error.message);
     throw new Error(error);
@@ -354,7 +441,12 @@ const resetPassword = async (req, res) => {
 
 const verificationLoad = async (req, res) => {
   try {
-    res.render("verification");
+    const categoryData = await Category.find().populate("offer").exec();
+ const cart = await Cart.findOne({ user: req.session.user_id })
+      .populate("products.productId")
+      .exec();
+
+    res.render("verification",{cart: cart,category: categoryData,});
    } catch (error) {console.log(error.message);
     throw new Error(error);
   }
@@ -369,9 +461,15 @@ const sentVerificationLink = async (req, res) => {
 
       res.render("verification", {
         message: "Reset verification mail sent your mail id, please check.",
+        cart: cart,
+        category: categoryData,
       });
     } else {
-      res.render("verification", { message: "This email is not exist." });
+      res.render("verification", {
+        message: "This email is not exist.",
+        cart: cart,
+        category: categoryData,
+      });
     }
    } catch (error) {console.log(error.message);
     throw new Error(error);
@@ -429,8 +527,19 @@ const changePassword = async (req, res) => {
 // shope start here
 const shopLoad = async (req, res) => {
   try {
-    const categoryData = await Category.find({});
+    let userData;
+
+    if (req.session.user_id) {
+      userData = await User.findById(req.session.user_id);
+    }
+
+    const categoryData = await Category.find().populate("offer").exec();
+    const cart = await Cart.findOne({ user: req.session.user_id })
+      .populate("products.productId")
+      .exec();
+
     const brandData = await Brand.find({});
+    const categoryData1 = await Category.find().populate("offer").exec();
 
     let page = 1;
     if (req.query.page) {
@@ -502,21 +611,7 @@ const shopLoad = async (req, res) => {
       query.brand = req.query.brand;
     }
 
-
-
-
-    /**.sort({_id:-1 for latest sorting is _id better to change by createdAt:-1}) */
-    let products = await Product.find(query)
-      .populate("brand category offer")
-      .populate({
-        path: "category",
-        populate: {
-          path: "offer",
-        },
-      })
-      .sort({ createdAt: -1 })
-      .limit(limit * 1)
-      .skip((page - 1) * limit);
+    let products;
 
     if (req.query.sortValue && req.query.sortValue != 3) {
       products = await Product.find(query)
@@ -531,7 +626,6 @@ const shopLoad = async (req, res) => {
         .limit(limit * 1)
         .skip((page - 1) * limit);
     } else {
-      /**.sort({_id:-1 for latest sorting is _id better to change by createdAt:-1}) */
       products = await Product.find(query)
         .populate("brand category offer")
         .populate({
@@ -550,7 +644,7 @@ const shopLoad = async (req, res) => {
     const brandDetails = await Brand.find({});
     const totalProducts = await Product.countDocuments({ is_block: true });
     let pageCount = Math.ceil(totalProducts / limit);
-    const userData = await User.findById({ _id: userId });
+
     res.render("shop", {
       categoryList: categoryData,
       brandList: brandData,
@@ -560,25 +654,32 @@ const shopLoad = async (req, res) => {
       currentPage: page,
       pageCount,
       user: userId,
-      user: userData,
+      userData,
       brand: req.query.brand,
-      sortValue: req.query.sortVlaue,
+      sortValue: req.query.sortValue,
       minPrice: req.query.minPrice,
       maxPrice: req.query.maxPrice,
       search: req.query.search,
       category: req.query.category,
+      cart: cart,
     });
   } catch (error) {
     console.log(error);
+    // Handle the error appropriately, e.g., send an error response
+    res.status(500).send("Internal Server Error");
   }
 };
+
 
 //wishList
 const wishListLoad = async (req, res) => {
   try {
     const userData = await User.findById(req.session.user_id);
     const brandData = await Brand.find();
-    const categoryData = await Category.find();
+    const categoryData = await Category.find().populate("offer").exec();
+    const cart = await Cart.findOne({ user: req.session.user_id })
+      .populate("products.productId")
+      .exec();
 
     const productData = await Product.find({ is_block: true })
       .populate("category brand")
@@ -588,7 +689,7 @@ const wishListLoad = async (req, res) => {
       user: userData,
       brand: brandData,
       category: categoryData,
-      product: productData,
+      cart: cart,
     });
    } catch (error) {console.log(error.message);
     throw new Error(error);
@@ -597,10 +698,19 @@ const wishListLoad = async (req, res) => {
 //singleProductLoad
 const singleProductLoad = async (req, res) => {
   try {
+    let userData;
+
+    if (req.session.user_id) {
+      userData = await User.findById(req.session.user_id);
+    }
+
     const { id } = req.params;
-    const userData = await User.findById(req.session.user_id);
     const brandData = await Brand.find();
-    const categoryData = await Category.find();
+    const categoryData = await Category.find().populate("offer").exec();
+    const cart = await Cart.findOne({ user: req.session.user_id })
+      .populate("products.productId")
+      .exec();
+
     const findProduct = await Product.findById(id)
       .populate("brand category offer")
       .populate({
@@ -610,7 +720,6 @@ const singleProductLoad = async (req, res) => {
         },
       })
       .exec();
-    console.log(id);
 
     const productData = await Product.find({ is_block: true })
       .populate("category brand offer")
@@ -620,13 +729,17 @@ const singleProductLoad = async (req, res) => {
       user: userData,
       brand: brandData,
       category: categoryData,
+      cart: cart,
       product: productData,
       currProduct: findProduct,
     });
-   } catch (error) {console.log(error.message);
-    throw new Error(error);
+  } catch (error) {
+    console.log(error.message);
+    // Handle the error appropriately, e.g., send an error response
+    res.status(500).send("Internal Server Error");
   }
 };
+
 
 //user profile Load
 
@@ -637,6 +750,11 @@ const editLoad = async (req, res) => {
     const userData = await User.findById({ _id: id });
     const userAddress = await Address.find({ userId: id });
     const coupons = await couponDb.find({ status: true });
+    const categoryData = await Category.find().populate("offer").exec();
+    const cart = await Cart.findOne({ user: req.session.user_id })
+      .populate("products.productId")
+      .exec();
+
 
     console.log("User Data:", userData);
 
@@ -662,6 +780,8 @@ const editLoad = async (req, res) => {
         address: userAddress,
         coupons: coupons,
         referralHistory: referralHistory,
+        category: categoryData,
+        cart: cart,
       });
     } else {
       res.redirect("/home");
@@ -707,10 +827,6 @@ const updateProfile = async (req, res) => {
   }
 };
 
-// Export the controller
-module.exports = {
-  updateProfile,
-};
 
 // address Add
 

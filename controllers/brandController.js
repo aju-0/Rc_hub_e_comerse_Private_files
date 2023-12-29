@@ -1,4 +1,5 @@
 const Brand = require('../models/brandModel');
+
 const brandDashboard = async(req,res) => {
 
    try {

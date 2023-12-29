@@ -11,6 +11,8 @@ const brandController = require("../controllers/brandController");
 const bannerController = require("../controllers/bannerController");
 const couponController = require("../controllers/couponController");
 const offerController = require("../controllers/offerController");
+const dealController = require("../controllers/dealController");
+const { dealDashboard } = require("../controllers/dealController");
 
 adminRoute.use(session({ secret: config.sessionSecret }));
 adminRoute.use(express.json());
@@ -214,6 +216,22 @@ adminRoute.patch(
 
 adminRoute.get("/chat", auth.isLogin, adminController.chatScreen);
 
+
+
+// deal Dashboard Routes
+adminRoute.get("/brandDashboard", auth.isLogin, dealController.dealDashboard);
+
+// adminRoute.get("/new-brand", auth.isLogin, brandController.newBrandLoad);
+
+// adminRoute.post("/new-brand",imageUploader.uploadBrand.single("coverPic"),auth.isLogin,brandController.addBrand);
+
+// adminRoute.get("/edit-brand", auth.isLogin, brandController.editBrandLoad);
+
+// adminRoute.post(
+//   "/edit-brand",
+//   imageUploader.uploadBrand.single("coverPic"),
+//   brandController.updateBrand
+// );
 
 
 // Default Route

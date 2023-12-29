@@ -3,12 +3,17 @@ const Product = require("../models/productModel");
 const Brand = require("../models/brandModel");
 const Category = require("../models/categoryModel");
 const Contact = require("../models/contactModel");
+const Cart = require("../models/cart");
 //contact
 const contactLoad = async (req, res) => {
   try {
     const userData = await User.findById(req.session.user_id);
     const brandData = await Brand.find();
-    const categoryData = await Category.find();
+    const categoryData = await Category.find().populate("offer").exec();
+    const cart = await Cart.findOne({ user: req.session.user_id })
+      .populate("products.productId")
+      .exec();
+
 
     const productData = await Product.find({ is_block: true })
       .populate("category brand")
@@ -18,6 +23,8 @@ const contactLoad = async (req, res) => {
       user: userData,
       brand: brandData,
       category: categoryData,
+      cart: cart,
+
       product: productData,
     });
    } catch (error) {console.log(error.message);
